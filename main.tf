@@ -64,7 +64,7 @@ resource "aws_launch_template" "example" {
 
 # Auto Scaling Group
 resource "aws_autoscaling_group" "example" {
-  vpc_zone_identifier = [aws_subnet.subnet_a.id, aws_subnet.subnet_b.id]
+  vpc_zone_identifier = ["subnet-0ab186223db9ed82f", "subnet-0369760ebd3d3a70e"]
   desired_capacity    = 2
   max_size            = 2
   min_size            = 1
@@ -89,7 +89,7 @@ resource "aws_lb" "example" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.instance_sg.id]
-  subnets            = [aws_subnet.subnet_a.id, aws_subnet.subnet_b.id]
+  subnets            = ["subnet-0ab186223db9ed82f", "subnet-0369760ebd3d3a70e"]
 
   enable_deletion_protection = false
 }
