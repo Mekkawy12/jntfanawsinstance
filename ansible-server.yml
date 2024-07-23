@@ -1,6 +1,6 @@
 ---
 - name: Configure Server
-  hosts: localhost
+  hosts: all
   gather_facts: yes
   vars:
     domain: ""
@@ -63,7 +63,7 @@
       template: 
         src: /tmp/nginxdnsansibleconf/config/zonetemplate.j2
         dest: /tmp/{{ domain }}.db
-        
+
     - name: Create zone file
       command: sudo cp /tmp/{{ domain }}.db /etc/named/
 
