@@ -38,8 +38,8 @@ resource "aws_launch_template" "example" {
   key_name      = "MyKeyPair"
   user_data = base64encode(<<-EOF
     #!/bin/bash
-    sudo yum update
-    sudo yum install git
+    sudo yum update -y
+    sudo yum install git -y
     EOF
     )
 
