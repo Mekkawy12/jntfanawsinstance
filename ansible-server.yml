@@ -19,16 +19,16 @@
       register: current_ip 
 
     - name: Update and upgrade yum packages
-      command: sudo yum update
+      command: sudo yum update -y
 
     - name: Install nginx
-      command: sudo amazon-linux-extras install nginx1
+      command: sudo amazon-linux-extras install nginx1 -y
 
     - name: Install bind9
-      command: sudo yum install bind
+      command: sudo yum install bind -y
 
     - name: Install bind9utils
-      command: sudo yum install bind-utils
+      command: sudo yum install bind-utils -y
 
     - name: Create a directory
       command: sudo mkdir /usr/share/nginx/html/{{ domain }}
