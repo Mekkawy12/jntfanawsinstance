@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-1"
+  region = "eu-north-1"
 }
 
 # Create a VPC
@@ -49,7 +49,7 @@ resource "aws_security_group" "instance_sg" {
 # Launch Template
 resource "aws_launch_template" "example" {
   name_prefix   = "example-"
-  image_id      = "ami-0c55b159cbfafe1f0"  # Replace with your desired AMI ID
+  image_id      = "ami-0d7e17c1a01e6fa40"  # Replace with your desired AMI ID
   instance_type = "t3.micro"
   key_name      = MyKeyPair
 
@@ -62,7 +62,7 @@ resource "aws_launch_template" "example" {
     resource_type = "instance"
 
     tags = {
-      Name = "MyEC2Instance"
+      Name = "instance group machine"
     }
   }
 }
@@ -80,7 +80,7 @@ resource "aws_autoscaling_group" "example" {
 
   tag {
     key                 = "Name"
-    value               = "MyEC2Instance"
+    value               = "instance group"
     propagate_at_launch = true
   }
 
