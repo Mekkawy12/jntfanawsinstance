@@ -1,0 +1,70 @@
+---
+- name: Configure Server
+  hosts: localhost
+  gather_facts: yes
+  vars:
+    domain: ""
+
+  tasks:
+
+    - name: Get current ip
+      command: hostname -I
+      register: current_ip 
+
+    - name: Update and upgrade apt packages
+      ansible.builtin.apt:
+        update_cache: yes
+
+
+    - name: Install nginx
+      apt:
+        name: "nginx"
+        state: "latest"
+
+    - name: Install bind9
+      apt:
+        name: "bind9"
+        state: "latest"
+
+    - name: Install bind9utils
+      apt:
+        name: "bind9utils"
+        state: "latest"
+
+    - name: Create a directory
+      file:
+        path: /var/www/{{ domain }}
+        state: directory
+
+    - name: Create index.html
+      copy:
+        content: "<h1>NGINX TEST ENVIRONEMENT</h1>"
+        dest: /var/www/{{ domain }}/index.html
+
+    - name: Create domain
+      copy:
+        content: "server { listen 80; server_name {{ domain }}; root /var/www/{{ domain }}; index index.html; location / { try_files $uri $uri/ =404;}}"  
+        dest: /etc/nginx/sites-available/{{ domain }}
+
+    - name: Link the conf file
+      command: ln -s /etc/nginx/sites-available/{{ domain }} /etc/nginx/sites-enabled/{{ domain }}
+
+    - name: Create a directory
+      file:
+        path: /etc/bind/zones
+        state: directory
+
+    - name: Update /etc/bind/named.conf.local
+      lineinfile:
+        line: "zone \"{{ domain }}\" { type master; file \"/etc/bind/zones/db.{{ domain }}\";};"
+        path: /etc/bind/named.conf.local
+        create: yes
+        insertafter: EOF
+
+    - name: create a zone file
+      copy:
+        content: "$TTL    604800\n@       IN      SOA     {{ domain }}. webmaster.{{ domain }}. (\n                                2         ; Serial\n                           604800         ; Refresh\n                            86400         ; Retry\n                          2419200         ; Expire\n                           604800 )       ; Negative Cache TTL\n;\n        IN      NS      ns1.{{ domain }}.\nns1     IN      A       {{ current_ip.stdout  }}\n@       IN      A       {{ current_ip.stdout  }}"
+        dest: /etc/bind/zones/db.{{ domain }}
+
+    - name: Reload services
+      command: bash -c "service nginx restart && service named restart"
