@@ -2,27 +2,22 @@ provider "aws" {
   region = "eu-north-1"
 }
 
-# Create a VPC
-resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
-}
-
 # Create Subnets
 resource "aws_subnet" "subnet_a" {
-  vpc_id             = aws_vpc.main.id
-  cidr_block         = "10.0.1.0/24"
+  vpc_id             = "vpc-0f104f618f5765701"
+  cidr_block         = "172.31.2.0/24"
   availability_zone  = "eu-north-1a"
 }
 
 resource "aws_subnet" "subnet_b" {
-  vpc_id             = aws_vpc.main.id
-  cidr_block         = "10.0.2.0/24"
+  vpc_id             = "vpc-0f104f618f5765701"
+  cidr_block         = "172.31.3.0/24"
   availability_zone  = "eu-north-1b"
 }
 
 # Security Group for EC2 instances
 resource "aws_security_group" "instance_sg" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = "vpc-0f104f618f5765701"
 
   ingress {
     from_port   = 22
@@ -104,7 +99,7 @@ resource "aws_lb_target_group" "example" {
   name     = "example-tg"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = aws_vpc.main.id
+  vpc_id   = "vpc-0f104f618f5765701"
 
   health_check {
     healthy_threshold   = 2
