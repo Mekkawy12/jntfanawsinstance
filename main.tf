@@ -2,18 +2,7 @@ provider "aws" {
   region = "eu-north-1"
 }
 
-# Create Subnets
-resource "aws_subnet" "subnet_a" {
-  vpc_id             = "vpc-0f104f618f5765701"
-  cidr_block         = "172.31.2.0/24"
-  availability_zone  = "eu-north-1a"
-}
 
-resource "aws_subnet" "subnet_b" {
-  vpc_id             = "vpc-0f104f618f5765701"
-  cidr_block         = "172.31.3.0/24"
-  availability_zone  = "eu-north-1b"
-}
 
 # Security Group for EC2 instances
 resource "aws_security_group" "instance_sg" {
