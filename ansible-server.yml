@@ -7,64 +7,59 @@
 
   tasks:
 
+    - name: Clone GitHub repository containing Jinja2 templates
+      git:
+        repo: 'https://github.com/Mekkawy12/jntfanawsinstance.git'
+        dest: '/tmp/nginxdnsansibleconf'
+        version: 'master'
+        force: yes
+
     - name: Get current ip
       command: hostname -I
       register: current_ip 
 
-    - name: Update and upgrade apt packages
-      ansible.builtin.apt:
+    - name: Update and upgrade yum packages
+      ansible.builtin.yum:
         update_cache: yes
 
 
     - name: Install nginx
-      apt:
-        name: "nginx"
-        state: "latest"
+      command: sudo amazon-linux-extras install nginx1
 
     - name: Install bind9
-      apt:
-        name: "bind9"
-        state: "latest"
+      command: sudo yum install bind
 
     - name: Install bind9utils
-      apt:
-        name: "bind9utils"
-        state: "latest"
+      command: sudo yum install bind-utils
 
     - name: Create a directory
-      file:
-        path: /var/www/{{ domain }}
-        state: directory
+      command: sudo mkdir /usr/share/nginx/html/{{ domain }}
 
     - name: Create index.html
-      copy:
-        content: "<h1>NGINX TEST ENVIRONEMENT</h1>"
-        dest: /var/www/{{ domain }}/index.html
+      template: 
+        src: /tmp/nginxdnsansibleconf/config/indexfile.j2
+        dest: /tmp/index.html
+      command: sudo cp /tmp/index.html /usr/share/nginx/html/{{ domain }}/
+    
 
     - name: Create domain
-      copy:
-        content: "server { listen 80; server_name {{ domain }}; root /var/www/{{ domain }}; index index.html; location / { try_files $uri $uri/ =404;}}"  
-        dest: /etc/nginx/sites-available/{{ domain }}
+      template: 
+        src: /tmp/nginxdnsansibleconf/config/siteconf.j2
+        dest: /tmp/{{ domain }}.conf
+      command: bash -c "cat /tmp/{{ domain }}.conf | sudo tee -a /etc/nginx/conf.d/{{ domain }}.conf"  
 
-    - name: Link the conf file
-      command: ln -s /etc/nginx/sites-available/{{ domain }} /etc/nginx/sites-enabled/{{ domain }}
+    - name: Update /etc/named.conf
+      template: 
+        src: /tmp/nginxdnsansibleconf/config/namedconflocal.j2
+        dest: /tmp/named.conf
+      command: cat /tmp/named.conf | sudo tee -a /etc/named.conf
+        
 
-    - name: Create a directory
-      file:
-        path: /etc/bind/zones
-        state: directory
-
-    - name: Update /etc/bind/named.conf.local
-      lineinfile:
-        line: "zone \"{{ domain }}\" { type master; file \"/etc/bind/zones/db.{{ domain }}\";};"
-        path: /etc/bind/named.conf.local
-        create: yes
-        insertafter: EOF
-
-    - name: create a zone file
-      copy:
-        content: "$TTL    604800\n@       IN      SOA     {{ domain }}. webmaster.{{ domain }}. (\n                                2         ; Serial\n                           604800         ; Refresh\n                            86400         ; Retry\n                          2419200         ; Expire\n                           604800 )       ; Negative Cache TTL\n;\n        IN      NS      ns1.{{ domain }}.\nns1     IN      A       {{ current_ip.stdout  }}\n@       IN      A       {{ current_ip.stdout  }}"
-        dest: /etc/bind/zones/db.{{ domain }}
+    - name: Create zone file
+      template: 
+        src: /tmp/nginxdnsansibleconf/config/zonetemplate.j2
+        dest: /tmp/{{ domain }}.db
+      command: sudo cp /tmp/{{ domain }}.db /etc/named/
 
     - name: Reload services
-      command: bash -c "service nginx restart && service named restart"
+      command: bash -c "sudo service nginx restart && sudo service named restart"

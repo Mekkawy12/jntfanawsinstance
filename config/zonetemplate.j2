@@ -1,0 +1,11 @@
+$TTL    604800
+@       IN      SOA     {{ domain }}. webmaster.{{ domain }}. (
+                                2         ; Serial
+                           604800         ; Refresh
+                            86400         ; Retry
+                          2419200         ; Expire
+                           604800 )       ; Negative Cache TTL
+;
+        IN      NS      ns1.{{ domain }}.
+ns1     IN      A       {{ current_ip.stdout  }}
+@       IN      A       {{ current_ip.stdout  }}
