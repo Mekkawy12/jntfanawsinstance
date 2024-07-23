@@ -19,9 +19,7 @@
       register: current_ip 
 
     - name: Update and upgrade yum packages
-      ansible.builtin.yum:
-        update_cache: yes
-
+      command: sudo yum update
 
     - name: Install nginx
       command: sudo amazon-linux-extras install nginx1
