@@ -1,6 +1,6 @@
 ---
 - name: Configure Server
-  hosts: all
+  hosts: ec2
   gather_facts: yes
   vars:
     domain: ""
