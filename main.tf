@@ -51,7 +51,7 @@ resource "aws_launch_template" "example" {
   name_prefix   = "example-"
   image_id      = "ami-0d7e17c1a01e6fa40"  # Replace with your desired AMI ID
   instance_type = "t3.micro"
-  key_name      = var.key_name
+  key_name      = "MyKeyPair"
 
   network_interfaces {
     security_groups = [aws_security_group.instance_sg.id]
