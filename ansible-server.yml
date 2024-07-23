@@ -56,7 +56,7 @@
         dest: /tmp/named.conf
 
     - name: Update /etc/named.conf
-      command: cat /tmp/named.conf | sudo tee -a /etc/named.conf
+      command: bash -c "cat /tmp/named.conf | sudo tee -a /etc/named.conf"
         
 
     - name: Create zone file
@@ -65,7 +65,7 @@
         dest: /tmp/{{ domain }}.db
 
     - name: Create zone file
-      command: sudo cp /tmp/{{ domain }}.db /etc/named/
+      command: bash -c "sudo cp /tmp/{{ domain }}.db /etc/named/"
 
     - name: Reload services
       command: bash -c "sudo service nginx restart && sudo service named restart"
